@@ -26,6 +26,7 @@ const nav = [
   { href: "/programs", label: "Programs" },
   { href: "/#about", label: "Master Robert" },
   { href: "/#challenge", label: "Free Challenge" },
+  { href: "/partners", label: "For Schools" },
 ];
 
 const steps = [
@@ -326,6 +327,25 @@ export default function Home() {
               {testimonial.author}
             </figcaption>
           </figure>
+        </section>
+
+        {/* PARTNER SCHOOLS TEASER → /partners */}
+        <section className="px-[6%] pb-16">
+          <div className="flex flex-wrap items-center justify-between gap-8 border-4 border-ink p-8 md:p-12">
+            <div className="flex max-w-[680px] flex-col gap-3">
+              <Eyebrow>Own a martial arts school?</Eyebrow>
+              <h2 className="font-condensed text-4xl leading-[0.95] font-extrabold uppercase md:text-5xl">
+                Empty mats by day? <span className="text-red">Let&apos;s fill them.</span>
+              </h2>
+              <p className="text-lg text-muted">
+                Host Yotae Leaders in your idle daytime hours: your martial arts teaching, our
+                behavior lessons, and online academics through The VA School.
+              </p>
+            </div>
+            <Link href="/partners" className={`${btn.primary} ${btn.size.lg}`}>
+              Partner with Yotae →
+            </Link>
+          </div>
         </section>
 
         {/* FREE CHALLENGE */}

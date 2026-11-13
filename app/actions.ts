@@ -12,7 +12,7 @@
  */
 
 import { headers } from "next/headers";
-import { bookingOptions, site } from "@/lib/site";
+import { bookingOptions, partnerOptions, site } from "@/lib/site";
 import { deliver } from "@/lib/notify";
 import { rateLimit } from "@/lib/rate-limit";
 import {
@@ -113,4 +113,51 @@ export async function joinChallenge(_prev: FormState, formData: FormData): Promi
   if (!sent) return DELIVERY_FAILED;
 
   return { ok: true, message: "You're signed up! Day one will arrive in your inbox soon." };
+}
+
+// ---------------------------------------------------------------------------------------------
+
+/** Martial arts school owners asking to host Yotae Leaders (/partners). Same safety checklist. */
+export async function requestPartnership(_prev: FormState, formData: FormData): Promise<FormState> {
+  if (isBot(formData)) return { ok: true, message: "Thanks!" };
+
+  if (!rateLimit(`partner:${await clientIp()}`, { limit: 3, windowMs: 10 * 60_000 })) {
+    return TOO_MANY;
+  }
+
+  const schoolName = text(formData, "schoolName");
+  const contactName = text(formData, "contactName");
+  const email = text(formData, "email").toLowerCase();
+  const phone = text(formData, "phone");
+  const location = text(formData, "location");
+  const styles = text(formData, "styles");
+  const message = text(formData, "message");
+  const studentCount = oneOf(text(formData, "studentCount"), partnerOptions.studentCounts);
+  const daytime = manyOf(formData, "daytime", partnerOptions.daytime);
+  // Checkbox: present with value "yes" only when ticked. Compare exactly; never trust other values.
+  const coaching = text(formData, "coaching") === "yes";
+
+  const errors: FieldErrors = {
+    schoolName: checkText(schoolName, { label: "your school's name", min: 1, max: 120 }),
+    contactName: checkText(contactName, { label: "your name", min: 1, max: 100 }),
+    email: checkEmail(email),
+    phone: checkPhone(phone),
+    location: checkText(location, { label: "your city and state", min: 1, max: 120 }),
+    styles: checkText(styles, { label: "the styles you teach", max: 200 }),
+    studentCount: studentCount ? undefined : "Please choose your current student count.",
+    message: checkText(message, { label: "your message", max: 2000 }),
+  };
+
+  const realErrors = Object.fromEntries(Object.entries(errors).filter(([, v]) => v));
+  if (Object.keys(realErrors).length > 0 || !studentCount) {
+    return { ok: false, message: "Please check the highlighted fields.", errors: realErrors };
+  }
+
+  const sent = await deliver({
+    kind: "partner",
+    data: { schoolName, contactName, email, phone, location, styles, studentCount, daytime, coaching, message },
+  });
+  if (!sent) return DELIVERY_FAILED;
+
+  return { ok: true, message: "Thanks. We'll be in touch to talk about your daytime schedule." };
 }

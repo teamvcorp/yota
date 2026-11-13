@@ -35,6 +35,9 @@ export function SiteFooter() {
           <Link href="/#challenge" className={link}>
             Free challenge
           </Link>
+          <Link href="/partners" className={link}>
+            For schools
+          </Link>
           <Link href="/privacy" className={link}>
             Privacy
           </Link>

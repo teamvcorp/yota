@@ -174,3 +174,132 @@ export const disciplines = {
     body: "Shared goals, honest conversations and habits that carry from the mat into home life. Coaching is where the calm and the confidence meet.",
   },
 } as const;
+
+/* ============================================================================================
+ * PARTNER SCHOOLS program (/partners): existing martial arts schools host "Yotae Leaders"
+ * during their idle daytime hours. Facts about The VA School must come from
+ * docs/notes/vaschool-notes.md (verified). Never claim accreditation until it's confirmed.
+ * ========================================================================================== */
+
+export const vaSchool = {
+  name: "The VA School",
+  fullName: "The VA School (Von Der Becke Academy)",
+  // Partner-school students use the ONLINE program at app.vaschool.org.
+  // (homeschool-plus.com is only for The VA School's own locations, so don't use its claims here.)
+  url: "https://app.vaschool.org",
+  // Verified on app.vaschool.org (2026-11-12); see docs/notes/vaschool-notes.md
+  tagline: "A school built on mastery, not grades.",
+} as const;
+
+export const partner = {
+  programName: "Yotae Leaders",
+  roles: [
+    {
+      who: "Your school",
+      gives: [
+        "Your mat space during idle daytime hours",
+        "Your instructors, teaching your style, your way",
+        "A home base in your community",
+        "Your own martial arts fees, 100% kept",
+      ],
+    },
+    {
+      who: "Yotae",
+      gives: [
+        "Program structure and daily rhythm",
+        "Behavior lessons woven into martial arts time",
+        "Family coaching and enrollment support",
+      ],
+    },
+    {
+      who: "The VA School",
+      gives: [
+        "Online K–12 academics: progress one demonstrated skill at a time",
+        "A family dashboard: attendance, skills mastered and belt promotions, live on any phone",
+        "Character & Leadership and ABA Self-Regulation as core disciplines",
+      ],
+    },
+  ],
+  // SAMPLE ONLY. Adjust to each partner school's hours.
+  sampleDay: [
+    { time: "[8:30]", block: "Arrival and check-in", kind: "core" },
+    { time: "[9:00]", block: "Academics: math and ELA", kind: "academic" },
+    { time: "[10:30]", block: "Martial arts, taught by your instructors", kind: "martial" },
+    { time: "[11:30]", block: "Lunch", kind: "core" },
+    { time: "[12:15]", block: "Academics: science and social studies", kind: "academic" },
+    { time: "[1:30]", block: "Behavior lesson and leadership", kind: "behavior" },
+    { time: "[2:15]", block: "Martial arts: forms, sparring, rank prep", kind: "martial" },
+    { time: "[3:00]", block: "Dismissal. Your evening classes start as usual", kind: "core" },
+  ],
+  benefits: [
+    {
+      title: "Fill idle daytime hours",
+      body: "Your mats sit empty while kids are at school. Fill them with daytime students and keep 100% of the martial arts fees you charge. We take no cut.",
+    },
+    {
+      title: "Become a community anchor",
+      body: "Your school becomes the place that raises focused, respectful young leaders, and parents and neighbours notice.",
+    },
+    {
+      title: "Grow your evening roster",
+      body: "Daytime students and their families already know your school, your instructors and your culture.",
+    },
+    {
+      title: "Keep your style",
+      body: "You teach martial arts the way you always have. We add the behavior lessons and the academics around it.",
+    },
+  ],
+  faqs: [
+    {
+      q: "Do we have to change how we teach?",
+      a: "No. Your instructors teach your art and curriculum. Yotae adds short behavior lessons on self-regulation, character and leadership.",
+    },
+    {
+      q: "Who handles the academics?",
+      a: "Students are enrolled in The VA School's online, mastery-based K–12 program at app.vaschool.org. [ON-SITE SUPERVISION: who is in the room during academic blocks]",
+    },
+    {
+      q: "Who pays what?",
+      a: "Families pay the academic fees to The VA School through app.vaschool.org. Your martial arts fees are yours: you set your own price and keep 100% of it. Yotae takes nothing from what you charge for your art.",
+    },
+    {
+      q: "Can we also run Yotae Family Coaching?",
+      a: "Yes, as an optional add-on. We provide the program for a $500 annual teaching fee. Each student takes 4 tests at $150, whenever they're ready, and Yotae receives 50% of those Family Coaching testing fees only. You set your own tuition for the program and keep 100% of it, and we take nothing from your other programs.",
+    },
+    {
+      q: "Is The VA School accredited?",
+      a: "[ACCREDITATION STATUS: update once confirmed. Do not claim accreditation before then.]",
+    },
+    {
+      q: "Where is this available?",
+      a: "The VA School's online program serves families in every state. Where state-specific standards aren't built out yet, students start on nationally aligned standards. [PARTNER REGIONS]",
+    },
+  ],
+} as const;
+
+/*
+ * OPTIONAL ADD-ON for partner schools: license the Yotae Family Coaching program.
+ * Terms from the owner (2026-11-12). Numbers live here so the page maths can never drift from them.
+ *   - Yotae provides the program
+ *   - School pays an annual teaching fee
+ *   - Yotae receives a share of TESTING fees for this program only
+ *   - Tests are NOT on a yearly schedule: each student takes them when ready (owner, 2026-11-13)
+ *   - The school sets and keeps 100% of any tuition it charges for the program (owner, 2026-11-13)
+ */
+export const coachingLicense = {
+  annualFee: 500, // USD per year, paid by the school
+  testCount: 4, // tests per student across the whole program, taken when ready
+  testFee: 150, // USD per test, per student
+  yotaeShare: 0.5, // Yotae gets 50% of Family Coaching testing fees only
+  includes: [
+    "The full Yotae Family Coaching program and curriculum",
+    "Teaching materials and instructor guidance",
+    "A 4-level testing path. Families test when they're ready",
+  ],
+} as const;
+
+/** Partner inquiry form choices (server-side allow-lists). */
+export const partnerOptions = {
+  studentCounts: ["Under 50", "50–150", "150–300", "300+"],
+  daytime: ["Weekday mornings", "Weekday early afternoons", "Full school day"],
+} as const;

@@ -37,9 +37,23 @@ export type IntroRequest = {
 
 export type ChallengeSignup = { email: string };
 
+export type PartnerInquiry = {
+  schoolName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  location: string;
+  styles: string;
+  studentCount: string;
+  daytime: string[];
+  coaching: boolean; // interested in the Family Coaching add-on
+  message: string;
+};
+
 type Submission =
   | { kind: "intro"; data: IntroRequest }
-  | { kind: "challenge"; data: ChallengeSignup };
+  | { kind: "challenge"; data: ChallengeSignup }
+  | { kind: "partner"; data: PartnerInquiry };
 
 type Config = { resend: Resend; from: string; to: string; segmentId?: string };
 
@@ -76,9 +90,16 @@ export async function deliver(submission: Submission): Promise<boolean> {
   }
 
   try {
-    return submission.kind === "intro"
-      ? await sendIntro(cfg, submission.data, idempotencyKey(submission))
-      : await addChallengeSignup(cfg, submission.data, idempotencyKey(submission));
+    const key = idempotencyKey(submission);
+    // `switch` on the discriminant: TypeScript narrows `submission.data` to the right type in each case.
+    switch (submission.kind) {
+      case "intro":
+        return await sendIntro(cfg, submission.data, key);
+      case "challenge":
+        return await addChallengeSignup(cfg, submission.data, key);
+      case "partner":
+        return await sendPartner(cfg, submission.data, key);
+    }
   } catch (err) {
     // The SDK returns errors rather than throwing, but network failures can still throw.
     console.error("[yotae] delivery threw:", err instanceof Error ? err.name : "unknown");
@@ -153,4 +174,45 @@ async function addChallengeSignup(cfg: Config, d: ChallengeSignup, key: string):
   if (notice.error) console.error("[yotae] challenge notice failed:", notice.error.name);
 
   return contactOk || !notice.error;
+}
+
+// ---------------------------------------------------------------------------------------------
+
+/** Partner-school inquiry: plain-text email to the coach, with reply-to set to the school owner. */
+async function sendPartner(cfg: Config, d: PartnerInquiry, key: string): Promise<boolean> {
+  const body = [
+    "New PARTNER SCHOOL inquiry (Yotae Leaders) from the website.",
+    "",
+    `School:      ${d.schoolName}`,
+    `Contact:     ${d.contactName}`,
+    `Email:       ${d.email}`,
+    `Phone:       ${d.phone || "(not given)"}`,
+    `Location:    ${d.location}`,
+    `Styles:      ${d.styles || "(not given)"}`,
+    `Students:    ${d.studentCount}`,
+    `Daytime:     ${d.daytime.join(", ") || "(none picked)"}`,
+    `Family Coaching add-on: ${d.coaching ? "YES, interested" : "no"}`,
+    "",
+    "Message:",
+    d.message || "(none)",
+    "",
+    "Reply to this email to answer them directly.",
+  ].join("\n");
+
+  const { error } = await cfg.resend.emails.send(
+    {
+      from: cfg.from,
+      to: cfg.to,
+      replyTo: d.email,
+      subject: `Partner school inquiry${d.coaching ? " (+ Family Coaching)" : ""}: ${oneLine(d.schoolName)}`,
+      text: body,
+    },
+    { idempotencyKey: key },
+  );
+
+  if (error) {
+    console.error("[yotae] partner email failed:", error.name);
+    return false;
+  }
+  return true;
 }

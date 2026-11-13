@@ -20,6 +20,25 @@ Brand: **Yotae**, Yoga + Taekwondo + family life coaching, coach Master Robert V
 - `components/`: `SiteHeader`, `SiteFooter`, `Logo`, `Sprig`, `Stones`, `Eyebrow`, `ChallengeForm`, `PhotoPlaceholder`.
 - `app/book/BookingForm.tsx`: client multi-step form.
 
+## Partner schools program: `/partners` (added 2026-11-12)
+Existing martial arts schools host **Yotae Leaders** in idle daytime hours. The school teaches martial arts its own way,
+Yotae adds behavior lessons, and kids do academics online at **app.vaschool.org** (The VA School; facts in `vaschool-notes.md`).
+- Content: `partner`, `vaSchool` and `partnerOptions` in lib/site.ts. Form: `app/partners/PartnerForm.tsx` calls the
+  `requestPartnership` action, which calls `deliver({kind:"partner"})` and sends a Resend email (reply-to the school owner).
+  Rate limit is 3 per 10 min.
+- Linked from home nav ("For Schools"), a home teaser band above the challenge, and the footer.
+- **Fee model (from the owner, 2026-11-12):** families pay ALL academic fees to The VA School via app.vaschool.org. The partner
+  school keeps 100% of its own martial arts fees, and Yotae takes nothing from them. Shown in the fee strip, benefit 01, the
+  "Who pays what?" FAQ, the school role panel and the inquiry intro.
+- **Optional Family Coaching add-on (owner's terms, 2026-11-12):** Yotae provides the program. The school pays a **$500 annual
+  teaching fee**. Each student takes **4 tests at $150 per student, WHEN READY (not yearly)**, and Yotae gets **50% of Family
+  Coaching testing fees only**, so per student $600 across all 4 tests splits $300/$300. The numbers live in `coachingLicense`
+  (lib/site.ts, field `testCount`) and the page computes the example from them. Section `#family-coaching` on /partners (half zen,
+  half sharp). The form has a "coaching" checkbox, which puts "(+ Family Coaching)" in the email subject.
+  CONFIRMED 2026-11-13: the school sets its own tuition for the coaching program and keeps 100% of it (shown on the page and in the FAQ).
+- Placeholders the owner must fill in: on-site supervision during academics, accreditation status (NEVER claim accredited
+  until confirmed), partner regions, sample-day times.
+
 ## Design v3: SPLIT (APPROVED by the user 2026-11-12, the current direction)
 The user's verdict on v2: "good for taekwondo, not yoga". So the home page is now literally split:
 yoga = v1 soft style (`zen-*` tokens, `font-serif` Fraunces, `zen` styles in components/ui.ts, `Sprig`/`Stones`),

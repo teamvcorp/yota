@@ -24,11 +24,12 @@ export default function PrivacyPage() {
         <h1 className={`${heading.h1} text-6xl md:text-8xl`}>Privacy</h1>
         <p>
           We only collect what you type into our forms: your name, email, optional phone number,
-          and your session preferences for a free intro, or just your email for the 7-day
-          challenge.
+          and your session preferences for a free intro, just your email for the 7-day
+          challenge, or your school and contact details if you ask about becoming a partner school.
         </p>
         <p>
-          We use these details only to arrange your session or send the challenge. We don&apos;t
+          We use these details only to arrange your session, send the challenge or follow up on a
+          partner inquiry. We don&apos;t
           sell or share them, and this site has no advertising or tracking cookies.
         </p>
         <p>
