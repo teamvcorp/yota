@@ -1,0 +1,64 @@
+# Yotae site — build plan
+
+Source: canvas mockups `Main.dc.html`, `Programs.dc.html`, `SignUp.dc.html` (shared 2026-11-11).
+Brand: **Yotae**, Yoga + Taekwondo + family life coaching, coach Master Robert Vonderbecke.
+
+## Routes
+| Route       | Mockup            | Notes                                              |
+|-------------|-------------------|----------------------------------------------------|
+| `/`         | Main.dc.html      | Hero, Method, How it works, Programs preview, About, Testimonial, Free challenge |
+| `/programs` | Programs.dc.html  | 4 programs, 3 pricing tiers, FAQ                   |
+| `/book`     | SignUp.dc.html    | 3-step free intro form (client component + Server Action) |
+| `/privacy`  | (linked from form)| Placeholder privacy policy                         |
+
+## File map
+- `lib/site.ts`: **all editable content** (contact info, programs, prices, FAQ). Fill in the `[BRACKETS]` here.
+- `lib/validation.ts`: dependency-free input validation (server side).
+- `lib/rate-limit.ts`: in-memory per-IP limiter (swap for Upstash/Redis when on serverless).
+- `lib/notify.ts`: where form submissions are delivered. **Currently a stub**, see TODO.
+- `app/actions.ts`: Server Actions `requestIntro`, `joinChallenge`.
+- `components/`: `SiteHeader`, `SiteFooter`, `Logo`, `Sprig`, `Stones`, `Eyebrow`, `ChallengeForm`, `PhotoPlaceholder`.
+- `app/book/BookingForm.tsx`: client multi-step form.
+
+## Design v3: SPLIT (APPROVED by the user 2026-11-12, the current direction)
+The user's verdict on v2: "good for taekwondo, not yoga". So the home page is now literally split:
+yoga = v1 soft style (`zen-*` tokens, `font-serif` Fraunces, `zen` styles in components/ui.ts, `Sprig`/`Stones`),
+taekwondo = v2 sharp style. Mixed zones: the "Stronger together / ON AND OFF THE MAT" band (serif + condensed in one
+headline) and the Coaching card (rounded left, square right, straddling the seam).
+Only `/` is split. Programs, Book and Privacy are still pure v2, and the shared home sections below the method are v2.
+Content for the halves: `disciplines` in lib/site.ts. Backups: `../yota-design-v1-backup.tgz`, `../yota-design-v2-backup.tgz`.
+
+### Gotchas learned
+- Stopping a background `npx next start` task can leave the child `node` process holding the port.
+  Start with `node node_modules/next/dist/bin/next start -p PORT` instead, and check `netstat -ano | grep :PORT`.
+- Very tall CDP screenshots at deviceScaleFactor 2 can tile or repeat content. Use `SCALE=1`.
+- Git Bash rewrites `/` CLI args into Windows paths. Prefix with `MSYS_NO_PATHCONV=1`.
+
+## Design v2: "sharp contrast" (2026-11-12)
+The user found v1 "too feng shui". v2 follows the logo: black and white, hard edges, one red accent.
+- Tokens: ink #0B0B0B · white · paper #F3F3F0 · line #D4D4D0 · muted #555 · mist #BDBDBD (text on black)
+  · red #C8102E · red-bright #FF4D5E (small red text on black; plain red on black is only ~3.5:1, so large text only).
+- Type: Barlow Condensed 800 uppercase for headlines, Barlow for body. Fraunces was removed.
+- Motifs (`components/Decor.tsx`): `Slashes` (skewed bars, like the logo's "E"), `Eyebrow` (red bar + label),
+  `Ticker` (red word band), `cut` / `cut-lg` utilities (clipped corner, in globals.css), hard offset blocks behind photos.
+- Rhythm: sections alternate black / white / red with no gradients and no rounded corners (circles only in the Method icons).
+- Check phone layouts with `docs/notes/tools/phone-shots.mjs` (Chrome DevTools protocol, 390px viewport).
+  Plain `chrome --headless --window-size=390` is WRONG: the layout stays ~500px wide and the image gets cropped.
+
+## Design v1 (retired): earthy "garden gate"
+Backup: `../yota-design-v1-backup.tgz`. cream #F4EFE6 · forest #2F3A2C · clay #A4502F, Fraunces serif, sprigs, stones, arches.
+
+## Security decisions
+- Server Actions validate every field server-side; the client checks are only for convenience.
+- Honeypot field + per-IP rate limit on both forms.
+- Action returns only `{ ok, message, errors }`, never echoes raw input.
+- Security headers in `next.config.ts`: CSP (no nonces, so pages stay static), HSTS, X-Content-Type-Options,
+  Referrer-Policy, Permissions-Policy, frame-ancestors 'none'. `poweredByHeader: false`.
+- No third-party scripts. Fonts are self-hosted, so no requests go to Google at runtime.
+
+## Open decisions (owner: site owner)
+1. ~~Email delivery~~ DONE 2026-11-11: **Resend** (`lib/notify.ts`, see `resend-notes.md`). Still to do:
+   verify the domain in Resend, set the env vars from `.env.example`, and build the 7-day challenge Automation in Resend.
+2. Real content: prices, ages, schedule, bio, testimonial, address and phone, in `lib/site.ts`.
+3. Photos: replace `PhotoPlaceholder` with `next/image` once photos exist (put them in `public/images/`).
+4. Accent colour: mockup offers #A4502F (default), #55633F, #7A5C14, #C8102E. Change `--color-clay` in globals.css.

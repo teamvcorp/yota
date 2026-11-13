@@ -1,26 +1,83 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*
+ * Yotae design tokens, v2 "sharp contrast" (2026-11-12).
+ * The v1 earthy palette is in ../yota-design-v1-backup.tgz and described in docs/notes/PLAN.md.
+ *
+ * Tailwind v4 turns each `--color-*` into utilities: `--color-red` -> `bg-red`, `text-red`...
+ * Contrast (WCAG AA needs 4.5:1 for body text):
+ *   red on white 5.9:1 OK · white on red 5.9:1 OK · red-bright on ink 6.4:1 OK
+ *   Plain `red` on ink is only ~3.5:1, so use it on black for big shapes/headlines only;
+ *   use `red-bright` for small red text on black.
+ */
+@theme {
+  --color-ink: #0b0b0b; /* near-black: backgrounds, text, borders */
+  --color-paper: #f3f3f0; /* light grey alternate panels */
+  --color-line: #d4d4d0; /* subtle dividers on white */
+  --color-muted: #555555; /* secondary text on white (7.4:1) */
+  --color-mist: #bdbdbd; /* secondary text on black */
+  --color-red: #c8102e; /* brand accent (taekwondo red) */
+  --color-red-bright: #ff4d5e; /* small red text on black */
+
+  /*
+   * YOGA ("zen") palette: the original v1 earthy style, used only for yoga content in the
+   * split design (2026-11-12). The `zen-` prefix keeps the two worlds from mixing by accident:
+   * `bg-zen-cream`, `text-zen-clay`...
+   */
+  --color-zen-cream: #f4efe6; /* yoga background */
+  --color-zen-paper: #fbf8f2; /* yoga cards */
+  --color-zen-sand: #e8dfcf; /* yoga alternate panel */
+  --color-zen-line: #cfc4b0; /* yoga borders */
+  --color-zen-ink: #1e1b18; /* yoga text (warm black) */
+  --color-zen-muted: #54493c; /* yoga secondary text */
+  --color-zen-forest: #2f3a2c; /* deep green */
+  --color-zen-moss: #5f7049; /* leaves */
+  --color-zen-olive: #4c5c3a; /* italic taglines */
+  --color-zen-clay: #a4502f; /* yoga accent */
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-barlow), system-ui, sans-serif;
+  --font-condensed: var(--font-barlow-condensed), "Arial Narrow", sans-serif;
+  --font-serif: var(--font-fraunces), Georgia, serif; /* yoga headlines */
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.6;
+}
+
+::selection {
+  background: var(--color-red);
+  color: #ffffff;
+}
+
+/* Visible keyboard focus everywhere (accessibility). */
+:focus-visible {
+  outline: 3px solid var(--color-red);
+  outline-offset: 3px;
+}
+
+/*
+ * The "cut corner" from the logo's angled strokes, used on filled buttons and panels.
+ * clip-path trims the bottom-right corner diagonally.
+ */
+@utility cut {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%);
+}
+@utility cut-lg {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0 100%);
 }
